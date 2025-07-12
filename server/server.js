@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(
   cors({
     //  origin: 'http://localhost:5173', // Replace with your frontend URL
-    origin: "https://mern-ecommerce-razorpay.vercel.app/",
+    origin: "https://mern-ecommerce-razorpay.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
