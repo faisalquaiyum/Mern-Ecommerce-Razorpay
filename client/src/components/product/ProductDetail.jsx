@@ -3,12 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import RelatedProduct from "./RelatedProduct";
 import AppContext from "../../context/AppContext";
-
+import { toast } from "react-toastify";
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const { id } = useParams();
-  const { addToCart, URL } = useContext(AppContext);
+  const { addToCart, URL, isAuthenticated } = useContext(AppContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +28,40 @@ const ProductDetail = () => {
 
     fetchProduct();
   }, [id]);
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      toast.warn("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    addToCart(
+      product._id,
+      product.title,
+      product.price,
+      1,
+      product.imgSrc
+    );
+    navigate("/cart");
+  };
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast.warn("Please login to add products to cart");
+      navigate("/login");
+      return;
+    }
+
+    addToCart(
+      product._id,
+      product.title,
+      product.price,
+      1,
+      product.imgSrc
+    );
+    toast.success("Added to cart!");
+  };
 
   if (!product) {
     return (
@@ -63,30 +97,13 @@ const ProductDetail = () => {
 
               <div className="flex gap-4 pt-4">
                 <button
-                  onClick={() => {
-                    addToCart(
-                      product._id,
-                      product.title,
-                      product.price,
-                      1,
-                      product.imgSrc
-                    );
-                    navigate("/cart");
-                  }}
+                  onClick={handleBuyNow}
                   className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6 py-2 rounded-lg transition"
                 >
                   Buy Now
                 </button>
                 <button
-                  onClick={() =>
-                    addToCart(
-                      product._id,
-                      product.title,
-                      product.price,
-                      1,
-                      product.imgSrc
-                    )
-                  }
+                  onClick={handleAddToCart}
                   className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-lg transition"
                 >
                   Add to Cart

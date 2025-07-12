@@ -8,7 +8,7 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
-  FaUserShield,
+  FaChevronDown,
 } from "react-icons/fa";
 import { HiOutlineSearch } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -21,7 +21,7 @@ const Navbar = () => {
   const location = useLocation();
   const { setFilteredData, products, logout, isAuthenticated, cart } =
     useContext(AppContext);
-  const cartCount = cart?.items?.length;
+  const cartCount = cart?.items?.length || 0;
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -29,17 +29,16 @@ const Navbar = () => {
     if (query) {
       navigate(`/product/search/${encodeURIComponent(query)}`);
       setSearchTerm("");
-      setMenuOpen(false); // Close on mobile after search
+      setMenuOpen(false); // Close mobile menu
     }
   };
 
-  //logout
   const handleLogout = () => {
     logout();
     navigate("/");
+    setMenuOpen(false);
   };
 
-  // category filter
   const filterByCategory = (cat) => {
     setFilteredData(
       products.filter(
@@ -47,7 +46,7 @@ const Navbar = () => {
       )
     );
   };
-  // Price filter
+
   const filterByPrice = (price) => {
     setFilteredData(products.filter((data) => data.price >= price));
   };
@@ -65,7 +64,7 @@ const Navbar = () => {
             E-Commerce
           </Link>
 
-          {/* Search bar */}
+          {/* Search Bar (Desktop) */}
           <form
             className="hidden sm:flex flex-1 justify-center px-4"
             onSubmit={submitHandler}
@@ -88,21 +87,16 @@ const Navbar = () => {
               <>
                 <Link
                   to="/cart"
-                  className="relative flex items-center gap-2 w-full hover:text-yellow-400 transition"
+                  className="relative flex items-center gap-2 hover:text-yellow-400 transition"
                 >
-                  {/* Wrapper for icon and badge */}
                   <div className="relative">
                     <FaShoppingCart className="text-xl" />
-
-                    {/* Badge */}
                     {cartCount > 0 && (
                       <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
                         {cartCount}
                       </span>
                     )}
                   </div>
-
-                  {/* Label */}
                   <span>Cart</span>
                 </Link>
 
@@ -135,16 +129,9 @@ const Navbar = () => {
                 </Link>
               </>
             )}
-
-            {/* <Link
-              to="/admin"
-              className="flex items-center gap-2 hover:text-yellow-400 transition"
-            >
-              <FaUserShield /> Admin
-            </Link> */}
           </div>
 
-          {/* Hamburger icon */}
+          {/* Hamburger Menu (Mobile) */}
           <button
             className="sm:hidden text-xl focus:outline-none"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -167,113 +154,149 @@ const Navbar = () => {
               <HiOutlineSearch className="absolute left-3 top-2.5 text-gray-400 text-xl" />
             </form>
 
-            <Link
-              to="/cart"
-              className="relative flex items-center gap-2 w-full hover:text-yellow-400 transition"
-            >
-              {/* Wrapper for icon and badge */}
-              <div className="relative">
-                <FaShoppingCart className="text-xl" />
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/cart"
+                  className="relative flex items-center gap-2 hover:text-yellow-400 transition"
+                >
+                  <div className="relative">
+                    <FaShoppingCart className="text-xl" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                        {cartCount}
+                      </span>
+                    )}
+                  </div>
+                  <span>Cart</span>
+                </Link>
 
-                {/* Badge */}
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                    {cartCount}
-                  </span>
-                )}
-              </div>
-
-              {/* Label */}
-              <span>Cart</span>
-            </Link>
-            <Link
-              to="/login"
-              className="flex items-center gap-2 w-full hover:text-yellow-400 transition"
-            >
-              <FaSignInAlt /> Login
-            </Link>
-            <Link
-              to="/register"
-              className="flex items-center gap-2 w-full hover:text-yellow-400 transition"
-            >
-              <FaUserPlus /> Register
-            </Link>
-            <Link
-              to="/profile"
-              className="flex items-center gap-2 w-full hover:text-yellow-400 transition"
-            >
-              <FaUser /> Profile
-            </Link>
-            <Link
-              to="/logout"
-              className="flex items-center gap-2 w-full hover:text-yellow-400 transition"
-            >
-              <FaSignOutAlt /> Logout
-            </Link>
-            <Link
-              to="/admin"
-              className="flex items-center gap-2 w-full hover:text-yellow-400 transition"
-            >
-              <FaUserShield /> Admin
-            </Link>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 hover:text-yellow-400 transition"
+                >
+                  <FaUser /> Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 hover:text-yellow-400 transition w-full text-left"
+                >
+                  <FaSignOutAlt /> Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="flex items-center gap-2 hover:text-yellow-400 transition"
+                >
+                  <FaSignInAlt /> Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="flex items-center gap-2 hover:text-yellow-400 transition"
+                >
+                  <FaUserPlus /> Register
+                </Link>
+              </>
+            )}
           </div>
         )}
       </nav>
 
-      {/* Sub Navbar / Filters */}
-      {location.pathname == "/" && (
-        <div className="bg-[#2a2a2a] text-white px-4 py-2 shadow-sm">
-          {/* if to stick sub_nav at top <div className="bg-[#2a2a2a] text-white px-4 py-2 shadow-sm sticky top-[64px] z-40"> */}
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:justify-between gap-4">
-            {/* Category Filters */}
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-yellow-400 font-semibold">Category:</span>
-              <button
-                onClick={() => setFilteredData(products)}
-                className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition"
-              >
-                All
-              </button>
-              <button
-                onClick={() => filterByCategory("mobiles")}
-                className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition"
-              >
-                Mobiles
-              </button>
-              <button
-                onClick={() => filterByCategory("laptops")}
-                className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition"
-              >
-                Laptops
-              </button>
-              <button
-                onClick={() => filterByCategory("cameras")}
-                className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition"
-              >
-                Cameras
-              </button>
-              <button
-                onClick={() => filterByCategory("headphones")}
-                className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition"
-              >
-                Headphones
-              </button>
+      {/* Subnavbar for Filters (Home page only) */}
+      {location.pathname === "/" && (
+        <div className="bg-[#2a2a2a] text-white px-4 py-3 shadow-sm">
+          <div className="max-w-7xl mx-auto">
+            {/* Mobile Accordion for Categories */}
+            <div className="sm:hidden mb-3">
+              <details className="group">
+                <summary className="flex justify-between items-center cursor-pointer list-none">
+                  <span className="text-yellow-400 font-semibold">
+                    Categories
+                  </span>
+                  <FaChevronDown className="text-xs transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setFilteredData(products)}
+                    className="px-3 py-1.5 text-sm rounded bg-gray-700 hover:bg-yellow-500 transition"
+                  >
+                    All
+                  </button>
+                  {["mobiles", "laptops", "cameras", "headphones"].map(
+                    (cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => filterByCategory(cat)}
+                        className="px-3 py-1.5 text-sm rounded bg-gray-700 hover:bg-yellow-500 transition capitalize"
+                      >
+                        {cat}
+                      </button>
+                    )
+                  )}
+                </div>
+              </details>
             </div>
 
-            {/* Price Filters */}
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-yellow-400 font-semibold">
-                Price above:
-              </span>
-              {[15999, 25999, 49999, 69999, 89999].map((price) => (
+            {/* Mobile Accordion for Price Filters */}
+            <div className="sm:hidden">
+              <details className="group">
+                <summary className="flex justify-between items-center cursor-pointer list-none">
+                  <span className="text-yellow-400 font-semibold">
+                    Price Filters
+                  </span>
+                  <FaChevronDown className="text-xs transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {[15999, 25999, 49999, 69999, 89999].map((price) => (
+                    <button
+                      key={price}
+                      onClick={() => filterByPrice(price)}
+                      className="px-3 py-1.5 text-sm rounded bg-gray-700 hover:bg-yellow-500 transition"
+                    >
+                      ₹{price.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </details>
+            </div>
+
+            {/* Desktop View (unchanged) */}
+            <div className="hidden sm:flex sm:flex-row sm:justify-between gap-4">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-yellow-400 font-semibold">Category:</span>
                 <button
-                  key={price}
-                  onClick={() => filterByPrice(price)}
+                  onClick={() => setFilteredData(products)}
                   className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition"
                 >
-                  ₹{price}
+                  All
                 </button>
-              ))}
+                {["mobiles", "laptops", "cameras", "headphones"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => filterByCategory(cat)}
+                    className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition capitalize"
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-yellow-400 font-semibold">
+                  Price above:
+                </span>
+                {[15999, 25999, 49999, 69999, 89999].map((price) => (
+                  <button
+                    key={price}
+                    onClick={() => filterByPrice(price)}
+                    className="px-3 py-1 rounded bg-gray-700 hover:bg-yellow-500 transition"
+                  >
+                    ₹{price.toLocaleString()}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
